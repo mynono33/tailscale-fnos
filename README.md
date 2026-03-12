@@ -1,6 +1,5 @@
 # tailscale-fnos
-Tailcale for fnOS UI
-
+说明：Tailcale for fnOS UI
 版本: 1.94.2
 日期: 2026-03-11
 描述: 基于官方tailscale/tailscaled文件打包和设计UI适配飞牛fnOS上运行
