@@ -18,10 +18,8 @@
    3. Log日志查看
  
 <img src="images/1.png" alt="连接页面" width="300" />
-
-![连接页面](images/1.png)
-![自定义Login server](images/2.png)
-![实时流量查看](images/3.png)
-![ping测试](images/4.png)
-![设备管理](images/5.png)
+<img src="images/2.png" alt="自定义Login server" width="300" />
+<img src="images/3.png" alt="实时流量查看" width="300" />
+<img src="images/4.png" alt="ping测试" width="300" />
+<img src="images/5.png" alt="设备管理" width="300" />
   
