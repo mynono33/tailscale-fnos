@@ -16,6 +16,8 @@
    1. Login server 自定义（兼容Headscale）
    2. 高级设置：DNS、shields up模式设置
    3. Log日志查看
+ 
+<img src="images/1.png" alt="连接页面" width="300" />
 
 ![连接页面](images/1.png)
 ![自定义Login server](images/2.png)
