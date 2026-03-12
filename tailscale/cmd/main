@@ -1,1 +1,150 @@
+#!/bin/bash
 
+LOG_FILE="${TRIM_PKGVAR}/tailscale.log"
+PID_FILE="${TRIM_PKGVAR}/tailscale.pid"
+LOG_CHECK_MARKER="${TRIM_PKGVAR}/.log_check_marker"
+TS_STATE_DIR="${TRIM_PKGVAR}/tailscale-state"
+TS_SOCKET="${TRIM_PKGVAR}/tailscaled.sock"
+
+TS_BIN="${TRIM_APPDEST}/server/tailscale"
+TSD_BIN="${TRIM_APPDEST}/server/tailscaled"
+
+LOG_MAX_SIZE=1048576  # 1MB
+LOG_CHECK_INTERVAL=3  # 天
+
+check_log_size() {
+    local should_check=false
+    if [ ! -f "${LOG_CHECK_MARKER}" ]; then
+        should_check=true
+    else
+        local last_check=$(cat "${LOG_CHECK_MARKER}" 2>/dev/null | tr -d '[:space:]')
+        if [ -n "$last_check" ]; then
+            local current_time=$(date +%s)
+            local days_diff=$(( (current_time - last_check) / 86400 ))
+            [ "$days_diff" -ge "$LOG_CHECK_INTERVAL" ] && should_check=true
+        else
+            should_check=true
+        fi
+    fi
+
+    if [ "$should_check" = true ]; then
+        if [ -f "${LOG_FILE}" ]; then
+            local file_size=$(stat -c%s "${LOG_FILE}" 2>/dev/null || stat -f%z "${LOG_FILE}" 2>/dev/null)
+            if [ "${file_size:-0}" -gt "${LOG_MAX_SIZE}" ]; then
+                echo "$(date '+%Y-%m-%d %H:%M:%S') - Log file exceeded 1MB, clearing content" > "${LOG_FILE}"
+            fi
+        fi
+        echo "$(date +%s)" > "${LOG_CHECK_MARKER}"
+    fi
+}
+
+log_msg() {
+    check_log_size
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "${LOG_FILE}"
+}
+
+check_process() {
+    local pid=$1
+    kill -0 "${pid}" 2>/dev/null
+}
+
+stop_process() {
+    log_msg "Stopping tailscale..."
+
+    # tailscale down
+    "${TS_BIN}" --socket="${TS_SOCKET}" down 2>/dev/null || true
+
+    # 停 tailscaled
+    if [ -f "${PID_FILE}" ]; then
+        pid=$(cat "${PID_FILE}" | tr -d '[:space:]')
+        if check_process "${pid}"; then
+            kill -TERM "${pid}" 2>/dev/null
+            local count=0
+            while check_process "${pid}" && [ $count -lt 10 ]; do
+                sleep 1
+                count=$((count + 1))
+            done
+            check_process "${pid}" && kill -KILL "${pid}" 2>/dev/null
+        fi
+        rm -f "${PID_FILE}"
+    fi
+
+    # 兜底 pkill
+    pkill -f "tailscaled" 2>/dev/null || true
+
+    log_msg "Stop completed."
+    return 0
+}
+
+start_process() {
+    log_msg "Starting tailscale..."
+    stop_process
+
+    mkdir -p "${TS_STATE_DIR}" "${TRIM_PKGVAR}"
+
+    # 启动 tailscaled
+    "${TSD_BIN}" \
+        --state="${TS_STATE_DIR}/tailscaled.state" \
+        --socket="${TS_SOCKET}" \
+        >> "${LOG_FILE}" 2>&1 &
+    tsd_pid=$!
+    echo "${tsd_pid}" > "${PID_FILE}"
+    log_msg "tailscaled started, PID=${tsd_pid}"
+
+    # 等待 socket 就绪
+    local count=0
+    while [ ! -S "${TS_SOCKET}" ] && [ $count -lt 15 ]; do
+        sleep 1
+        count=$((count + 1))
+    done
+
+    if [ ! -S "${TS_SOCKET}" ]; then
+        log_msg "ERROR: tailscaled socket not ready after 15s"
+        return 1
+    fi
+	
+    # 设置 www-data 为 operator，允许非 root 操作，同时两个更改就需要root
+    "${TS_BIN}" --socket="${TS_SOCKET}" set --operator=www-data 2>/dev/null || true
+
+    # 写路径配置供 index.cgi 读取
+    cat > "${TRIM_PKGVAR}/tailscale_env" << EOF
+TS_BIN=${TS_BIN}
+TS_SOCKET=${TS_SOCKET}
+TS_LOG_FILE=${LOG_FILE}
+CONF_DIR=${TRIM_PKGVAR}
+EOF
+
+    log_msg "Start completed. Please connect via Web UI."
+    return 0
+}
+
+status() {
+    if [ -f "${PID_FILE}" ]; then
+        pid=$(cat "${PID_FILE}" | tr -d '[:space:]')
+        if check_process "${pid}"; then
+            return 0
+        else
+            rm -f "${PID_FILE}"
+        fi
+    fi
+    return 1
+}
+
+case $1 in
+start)
+    start_process
+    ;;
+stop)
+    stop_process
+    ;;
+status)
+    if status; then
+        exit 0
+    else
+        exit 3
+    fi
+    ;;
+*)
+    exit 1
+    ;;
+esac

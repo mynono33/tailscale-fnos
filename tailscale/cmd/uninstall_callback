@@ -1,0 +1,9 @@
+#!/bin/bash
+
+WIZARD_DATA_ACTION="$wizard_data_action"
+
+if [ "$WIZARD_DATA_ACTION" = "delete" ]; then
+    rm -rf ${TRIM_PKGVAR} ${TRIM_DATA_SHARE_PATHS%%:*} ${TRIM_PKGHOME}
+fi
+
+exit 0

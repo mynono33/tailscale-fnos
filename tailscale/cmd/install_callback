@@ -1,0 +1,3 @@
+#!/bin/bash
+setcap cap_net_admin,cap_net_raw+eip /vol1/@appcenter/tailscale/server/tailscaled
+exit 0
