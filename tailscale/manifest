@@ -1,1 +1,15 @@
-
+appname=tailscale
+version=1.94.2
+display_name=Tailscale
+desc="""<p><strong>Tailscale VPN 客户端</strong>，支持自定义控制服务器（兼容 Headscale）</p>
+<p>支持子网路由、出口节点选择、实时流量监控、ping节点测试及多设备管理，力求展现所有功能</p>"""
+platform=x86
+source=thirdparty
+maintainer=Tailscale Inc
+maintainer_url=https://tailscale.com/
+distributor=huangzhe
+distributor_url=https://github.com/
+ctl_stop=true
+desktop_uidir=ui
+desktop_applaunchname=tailscale.Application
+changelog=Initial release
