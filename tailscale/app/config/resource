@@ -1,1 +1,28 @@
-
+{
+    "data-share":
+    {
+        "shares":
+        [
+            {
+                "name": "tailscale",
+                "permission":
+                {
+                    "rw":
+                    [
+                        "tailscale"
+                    ]
+                }
+            },
+            {
+                "name": "tailscale/data",
+                "permission":
+                {
+                    "rw":
+                    [
+                        "tailscale"
+                    ]
+                }
+            }
+        ]
+    }
+}
