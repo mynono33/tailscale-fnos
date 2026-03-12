@@ -19,7 +19,7 @@
 
 <div style="display: flex; justify-content: space-around;">
   <img src="images/1.png" alt="连接页面" width="300" />
-  <img src="images/2.png" alt="自定义Login server" width="300" />
+  <img src="images/2.png" alt="连接页面" width="300" />
 </div>
 
   
