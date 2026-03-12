@@ -1,0 +1,13 @@
+{
+  ".url": {
+    "tailscale.Application": {
+      "allUsers": true,
+      "protocol": "http",
+      "title": "tailscale",
+      "desc": "tailscale",      
+      "icon": "images/icon_{0}.png",
+      "type": "iframe",
+      "url": "/cgi/ThirdParty/tailscale/index.cgi/"
+    }
+  }
+}
