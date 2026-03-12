@@ -18,7 +18,7 @@
    3. Log日志查看
 
 <div style="display: flex; justify-content: space-around;">
-  <img src="images/1.png" alt="连接页面" width="300" />
+  <img src="images/1.jpg" alt="连接页面" width="300" />
   <img src="images/2.jpg" alt="Login server自定义" width="300" />
 </div>
 <div style="display: flex; justify-content: space-around;">
