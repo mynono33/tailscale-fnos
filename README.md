@@ -17,5 +17,9 @@
    2. 高级设置：DNS、shields up模式设置
    3. Log日志查看
 
-  ![可查看实时流量](images/1.png)
+  ![连接页面](images/1.png)
+  ![自定义Login server](images/2.png)
+  ![实时流量查看](images/3.png)
+  ![ping测试](images/4.png)
+  ![设备管理](images/5.png)
   
