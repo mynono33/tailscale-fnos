@@ -17,5 +17,5 @@
    2. 高级设置：DNS、shields up模式设置
    3. Log日志查看
 
-  ![可查看实时流量][images/1.png]
+  ![可查看实时流量](images/1.png)
   
